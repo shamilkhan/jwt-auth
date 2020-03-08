@@ -29,34 +29,36 @@ namespace Avito
         public void ConfigureServices(IServiceCollection services)
         {
 
-            // Inject an implementation of ISwaggerProvider with defaulted settings applied
-            services.AddSwaggerGen(x =>
-            {
-                x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    In = ParameterLocation.Header,
-                    Description = "Please insert JWT with Bearer into field",
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey,
-                    BearerFormat = "JWT"
-                });
+            //services.AddSwaggerGen()
 
-                x.AddSecurityRequirement(new OpenApiSecurityRequirement()
-                {
-                    {   new OpenApiSecurityScheme
-                    {
-                        Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
-                    },
-                    new string[] {}}
-                });
-                x.SwaggerDoc("v1", new OpenApiInfo { Title = "RealWorld API", Version = "v1" });
-                x.CustomSchemaIds(y => y.FullName);
-                x.DocInclusionPredicate((version, apiDescription) => true);
-                x.TagActionsBy(y => new List<string>()
-                {
-                    y.GroupName
-                });
-            });
+            //// Inject an implementation of ISwaggerProvider with defaulted settings applied
+            //services.AddSwaggerGen(x =>
+            //{
+            //    x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            //    {
+            //        In = ParameterLocation.Header,
+            //        Description = "Please insert JWT with Bearer into field",
+            //        Name = "Authorization",
+            //        Type = SecuritySchemeType.ApiKey,
+            //        BearerFormat = "JWT"
+            //    });
+
+            //    x.AddSecurityRequirement(new OpenApiSecurityRequirement()
+            //    {
+            //        {   new OpenApiSecurityScheme
+            //        {
+            //            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+            //        },
+            //        new string[] {}}
+            //    });
+            //    x.SwaggerDoc("v1", new OpenApiInfo { Title = "RealWorld API", Version = "v1" });
+            //    x.CustomSchemaIds(y => y.FullName);
+            //    x.DocInclusionPredicate((version, apiDescription) => true);
+            //    x.TagActionsBy(y => new List<string>()
+            //    {
+            //        y.GroupName
+            //    });
+            //});
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                     .AddJwtBearer(options =>
@@ -83,6 +85,10 @@ namespace Avito
                         };
                     });
             services.AddControllers();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -95,6 +101,14 @@ namespace Avito
 
             app.UseHttpsRedirection();
 
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui assets(HTML, JS, CSS etc.)
+            app.UseSwaggerUI(x =>
+            {
+                x.SwaggerEndpoint("/swagger/v1/swagger.json", "RealWorld API V1");
+            });
+
             app.UseRouting();
 
             app.UseAuthentication();
@@ -106,16 +120,10 @@ namespace Avito
             });
 
             // Enable middleware to serve generated Swagger as a JSON endpoint
-            app.UseSwagger(c =>
-            {
-                c.RouteTemplate = "swagger/{documentName}/swagger.json";
-            });
-
-            // Enable middleware to serve swagger-ui assets(HTML, JS, CSS etc.)
-            app.UseSwaggerUI(x =>
-            {
-                x.SwaggerEndpoint("/swagger/v1/swagger.json", "RealWorld API V1");
-            });
+            //app.UseSwagger(c =>
+            //{
+            //    c.RouteTemplate = "swagger/{documentName}/swagger.json";
+            //});
         }
     }
 }
